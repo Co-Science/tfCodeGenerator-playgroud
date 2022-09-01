@@ -277,24 +277,44 @@ export class State {
     }
 
     let network_shape = map["networkShape"].split(',');
-    
+    console.log(network_shape);
+
+    let network_shape_len:number;
+
+    if (isNaN(parseInt(network_shape[0])))
+    {
+      network_shape_len = 0;
+    } 
+    else 
+    {
+      network_shape_len = network_shape.length;
+    }
+
     let count_input: Number = true_or_false(map["sinX"]) + true_or_false(map["sinY"]) +
       true_or_false(map["x"]) + true_or_false(map["y"]) +
       true_or_false(map["xSquared"]) + true_or_false(map["xTimesY"]) +
       true_or_false(map["ySquared"])
 
-    let pythoncode: String = `
-    import tensorflow as tf
+    let layernum:number = 1;  
+    let pythoncode: String = `import tensorflow as tf
     
-    class MyModel(tf.keras.Model):
+class MyModel(tf.keras.Model):
     
-      def __init__(self):
-        super().__init__()
-        tf.keras.Input(shape=(${count_input},))`;
+\tdef __init__(self):
+\t\tsuper().__init__()
+\t\tself.layer${layernum++} = tf.keras.Input(shape=(${count_input},))`;
 
-    for (let i = 0; i < network_shape.length; i++) {
-      pythoncode += `\n        tf.keras.layers.Dense(${parseInt(network_shape[i])}, activation='${map["activation"]}')`
+    for (let i = 0; i < network_shape_len; i++) {
+      
+      pythoncode += `\n\t\tself.layer${layernum++} = tf.keras.layers.Dense(${parseInt(network_shape[i])}, activation='${map["activation"]}')`
     }
+
+    pythoncode += '\n\tdef call(self, inputs):\n\t\tx = self.layer1(inputs)\n\t\t';
+
+    for (let i = 1; i <= network_shape_len; i++) {
+      pythoncode += `x = self.layer${i+1}(x)\n\t\t`;
+    }
+    pythoncode += 'return x';
 
     console.log(pythoncode)
 
