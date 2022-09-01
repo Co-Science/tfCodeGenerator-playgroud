@@ -103,6 +103,10 @@ export interface Property {
 // Add the GUI state.
 export class State {
 
+  constructor(){
+    window['State'] = this;
+  }
+
   private static PROPS: Property[] = [
     {name: "activation", type: Type.OBJECT, keyMap: activations},
     {name: "regularization", type: Type.OBJECT, keyMap: regularizations},
@@ -168,11 +172,43 @@ export class State {
    * Deserializes the state from the url hash.
    */
   static deserializeState(): State {
+
     let map: {[key: string]: string} = {};
     for (let keyvalue of window.location.hash.slice(1).split("&")) {
       let [name, value] = keyvalue.split("=");
       map[name] = value;
     }
+
+    function true_or_false(ip:string){
+      return ip[0] == "t" ? 1 : 0;
+    }
+
+    console.log(map)
+
+    let network_shape = map["networkShape"].split(',');
+
+    // let input_size = Boolean(map["sinX"]) + Boolean(map["sinY"]) + Boolean(map["xSquared"]) + Boolean(map["ySquared"]) + Boolean(map["x"]) + Boolean(map["y"]) + Boolean(map["xTimesY"])
+
+    let count_input:Number = true_or_false(map["sinX"]) + true_or_false(map["sinY"]) +
+                              true_or_false(map["x"]) + true_or_false(map["y"]) + 
+                              true_or_false(map["xSquared"]) + true_or_false(map["xTimesY"]) +
+                              true_or_false(map["ySquared"])
+
+    let pythoncode:String = `
+    import tensorflow as tf
+    
+    class MyModel(tf.keras.Model):
+    
+      def __init__(self):
+        super().__init__()
+        tf.keras.Input(shape=(${count_input},))`;
+
+    for (let i = 0; i < network_shape.length; i++) {
+      pythoncode += `\n        tf.keras.layers.Dense(${parseInt(network_shape[i])}, activation='${map["activation"]}')`
+    }
+
+    console.log(pythoncode)
+
     let state = new State();
 
     function hasKey(name: string): boolean {
@@ -263,6 +299,7 @@ export class State {
       props.push(`${prop}=${this[prop]}`);
     });
     window.location.hash = props.join("&");
+    console.log(props);
   }
 
   /** Returns all the hidden properties. */
