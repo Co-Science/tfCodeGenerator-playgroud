@@ -264,60 +264,7 @@ export class State {
     getHideProps(this).forEach(prop => {
       props.push(`${prop}=${this[prop]}`);
     });
-    window.location.hash = props.join("&");
-
-    function true_or_false(ip: string) {
-      return ip[0] == "t" ? 1 : 0;
-    }
-
-    let map: { [key: string]: string } = {};
-    for (let keyvalue of window.location.hash.slice(1).split("&")) {
-      let [name, value] = keyvalue.split("=");
-      map[name] = value;
-    }
-
-    let network_shape = map["networkShape"].split(',');
-    console.log(network_shape);
-
-    let network_shape_len:number;
-
-    if (isNaN(parseInt(network_shape[0])))
-    {
-      network_shape_len = 0;
-    } 
-    else 
-    {
-      network_shape_len = network_shape.length;
-    }
-
-    let count_input: Number = true_or_false(map["sinX"]) + true_or_false(map["sinY"]) +
-      true_or_false(map["x"]) + true_or_false(map["y"]) +
-      true_or_false(map["xSquared"]) + true_or_false(map["xTimesY"]) +
-      true_or_false(map["ySquared"])
-
-    let layernum:number = 1;  
-    let pythoncode: String = `import tensorflow as tf
-    
-class MyModel(tf.keras.Model):
-    
-\tdef __init__(self):
-\t\tsuper().__init__()
-\t\tself.layer${layernum++} = tf.keras.Input(shape=(${count_input},))`;
-
-    for (let i = 0; i < network_shape_len; i++) {
-      
-      pythoncode += `\n\t\tself.layer${layernum++} = tf.keras.layers.Dense(${parseInt(network_shape[i])}, activation='${map["activation"]}')`
-    }
-
-    pythoncode += '\n\tdef call(self, inputs):\n\t\tx = self.layer1(inputs)\n\t\t';
-
-    for (let i = 1; i <= network_shape_len; i++) {
-      pythoncode += `x = self.layer${i+1}(x)\n\t\t`;
-    }
-    pythoncode += 'return x';
-
-    console.log(pythoncode)
-
+    // window.location.hash = props.join("&");
   }
 
   /** Returns all the hidden properties. */

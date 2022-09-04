@@ -409,23 +409,50 @@ export function generatePyCode(network: Node[][]):string {
 
   let network_shape = map["networkShape"].split(',');
 
-  let count_input: number = true_or_false(map["sinX"]) + true_or_false(map["sinY"]) +
-                        true_or_false(map["x"]) + true_or_false(map["y"]) +
-                        true_or_false(map["xSquared"]) + true_or_false(map["xTimesY"]) +
-                        true_or_false(map["ySquared"])
+  let network_shape_len:number;
 
-  let pythoncode: string = `
-  import tensorflow as tf
-  
-  class MyModel(tf.keras.Model):
-  
-    def __init__(self):
-      super().__init__()
-      tf.keras.Input(shape=(${count_input},))`;
-
-  for (let i = 0; i < network_shape.length; i++) {
-    pythoncode += `\n        tf.keras.layers.Dense(${parseInt(network_shape[i])}, activation='${map["activation"]}')`
+  if (isNaN(parseInt(network_shape[0])))
+  {
+    network_shape_len = 0;
+  } 
+  else 
+  {
+    network_shape_len = network_shape.length;
   }
 
-  return pythoncode
+  let count_input: Number = true_or_false(map["sinX"]) + 
+    true_or_false(map["sinY"]) +
+    true_or_false(map["x"]) + 
+    true_or_false(map["y"]) +
+    true_or_false(map["xSquared"]) + 
+    true_or_false(map["xTimesY"]) +
+    true_or_false(map["ySquared"])
+  
+  let layernum:number = 1;  
+  let pythoncode: string[] = [
+    'import tensorflow as tf',
+    '',
+    `class MyModel(tf.keras.Model):`,
+    '',
+    `\tdef __init__(self):`,
+    `\t\tsuper().__init__()`,
+    `\t\tself.layer${layernum++} = tf.keras.Input(shape=(${count_input},))`
+  ];
+  
+  for (let i = 0; i < network_shape_len; i++) {
+    pythoncode.push(`\t\tself.layer${layernum++} = tf.keras.layers.Dense(${parseInt(network_shape[i])}, activation='${map["activation"]}')`)
+  }
+  pythoncode.push(
+    '',
+    '\tdef call(self, inputs):',
+    '\t\tx = self.layer1(inputs)'
+  )
+  
+  for (let i = 1; i <= network_shape_len; i++) {
+    pythoncode.push(`\t\tx = self.layer${i+1}(x)`)
+  }
+  pythoncode.push('\t\treturn x')
+  console.log(pythoncode);
+  
+  return pythoncode.map(element=>element).join("\n")
 }
