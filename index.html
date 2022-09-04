@@ -39,6 +39,9 @@ limitations under the License.
   <link rel="stylesheet" href="bundle.css" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500|Material+Icons" rel="stylesheet" type="text/css">
   <script src="lib.js"></script>
+  <!-- Syntax Highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/default.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
 </head>
 <body>
   <!-- GitHub link -->
@@ -312,10 +315,7 @@ limitations under the License.
 
   <!-- Generated Code -->
   <div id="code-gen" class="column">
-    <button class="btn-generate">
-      Generate
-    </button>
-    <pre><code class="language-python" id="code-space"></code></pre>
+    <pre><code class="hljs python" id="code-space"></code></pre>
   </div>
 
   <!-- More -->
@@ -403,6 +403,9 @@ limitations under the License.
     </div>
   </footer>
   <script src="bundle.js"></script>
+  <!-- Syntax Highlighting -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/python.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
   <!-- Google analytics -->
   <script src="analytics.js"></script>
 </body>

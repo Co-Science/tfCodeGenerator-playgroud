@@ -30,13 +30,13 @@ import {AppendingLineChart} from "./linechart";
 import * as d3 from 'd3';
 
 let mainWidth,
-  showcode=true;
+  showcode=false;
 
 // Show generated code
-d3.select("#code-gen button").on("click", function() {
-  showcode = !showcode;
-  d3.select("#code-space").classed("display-show",showcode);
-})
+// d3.select("#code-gen button").on("click", function() {
+//   showcode = !showcode;
+//   d3.select("#code-space").classed("display-show",showcode);
+// })
 
 // More scrolling
 d3.select(".more button").on("click", function() {
