@@ -29,7 +29,14 @@ import {Example2D, shuffle} from "./dataset";
 import {AppendingLineChart} from "./linechart";
 import * as d3 from 'd3';
 
-let mainWidth;
+let mainWidth,
+  showcode=true;
+
+// Show generated code
+d3.select("#code-gen button").on("click", function() {
+  showcode = !showcode;
+  d3.select("#code-space").classed("display-show",showcode);
+})
 
 // More scrolling
 d3.select(".more button").on("click", function() {
@@ -629,6 +636,7 @@ function drawNetwork(network: nn.Node[][]): void {
         }
       }
     }
+    d3.select("#code-space").text(nn.generatePyCode(network));
   }
 
   // Draw the output node separately.
@@ -884,6 +892,7 @@ function updateUI(firstStep = false) {
   d3.select("#loss-test").text(humanReadable(lossTest));
   d3.select("#iter-number").text(addCommas(zeroPad(iter)));
   lineChart.addDataPoint([lossTrain, lossTest]);
+  d3.select("#code-space").text(nn.generatePyCode(network));
 }
 
 function constructInputIds(): string[] {

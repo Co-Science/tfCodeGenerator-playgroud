@@ -393,3 +393,39 @@ export function forEachNode(network: Node[][], ignoreInputs: boolean,
 export function getOutputNode(network: Node[][]) {
   return network[network.length - 1][0];
 }
+
+function true_or_false(ip: string) {
+  return ip[0] == "t" ? 1 : 0;
+}
+
+export function generatePyCode(network: Node[][]):string {
+
+
+  let map: { [key: string]: string } = {};
+  for (let keyvalue of window.location.hash.slice(1).split("&")) {
+    let [name, value] = keyvalue.split("=");
+    map[name] = value;
+  }
+
+  let network_shape = map["networkShape"].split(',');
+
+  let count_input: number = true_or_false(map["sinX"]) + true_or_false(map["sinY"]) +
+                        true_or_false(map["x"]) + true_or_false(map["y"]) +
+                        true_or_false(map["xSquared"]) + true_or_false(map["xTimesY"]) +
+                        true_or_false(map["ySquared"])
+
+  let pythoncode: string = `
+  import tensorflow as tf
+  
+  class MyModel(tf.keras.Model):
+  
+    def __init__(self):
+      super().__init__()
+      tf.keras.Input(shape=(${count_input},))`;
+
+  for (let i = 0; i < network_shape.length; i++) {
+    pythoncode += `\n        tf.keras.layers.Dense(${parseInt(network_shape[i])}, activation='${map["activation"]}')`
+  }
+
+  return pythoncode
+}
