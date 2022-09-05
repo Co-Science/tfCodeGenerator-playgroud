@@ -412,13 +412,10 @@ export function generatePyCode(network: Node[][]):string {
   let network_shape_len:number;
 
   if (isNaN(parseInt(network_shape[0])))
-  {
     network_shape_len = 0;
-  } 
   else 
-  {
     network_shape_len = network_shape.length;
-  }
+  
 
   let count_input: Number = true_or_false(map["sinX"]) + 
     true_or_false(map["sinY"]) +

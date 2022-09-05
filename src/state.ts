@@ -264,7 +264,7 @@ export class State {
     getHideProps(this).forEach(prop => {
       props.push(`${prop}=${this[prop]}`);
     });
-    // window.location.hash = props.join("&");
+    window.location.hash = props.join("&");
   }
 
   /** Returns all the hidden properties. */
